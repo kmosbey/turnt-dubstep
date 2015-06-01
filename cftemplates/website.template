@@ -1,0 +1,66 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "Template for Website",
+    "Parameters": {
+        "amiID": {
+            "Description": "The new ami id from packer",
+            "Type": "String"
+        },
+        "WebServerCapacity": {
+            "Default": "1",
+            "Description": "The initial number of WebServer instances",
+            "Type": "Number",
+            "MinValue": "1",
+            "MaxValue": "5",
+            "ConstraintDescription": "must be between 1 and 5 EC2 instances."
+        }
+    },
+    "Resources": {
+        "ElasticLoadBalancer": {
+            "Type": "AWS::ElasticLoadBalancing::LoadBalancer",
+            "Properties": {
+                "SecurityGroupIds" : [ "sg-81a0ace4", "sg-0fbfb36a" ],
+                "Subnets": [ "subnet-1221b377" ],
+                "Listeners": [
+                    { "LoadBalancerPort": "80",
+                      "InstancePort": "80",
+                      "Protocol": "HTTP" }
+                ],
+                "HealthCheck": {
+                    "Target": "HTTP:80/",
+                    "HealthyThreshold": "2",
+                    "UnhealthyThreshold": "5",
+                    "Interval": "5",
+                    "Timeout": "3"
+                }
+            }
+        },
+        "AutoScalingGroup": {
+            "Type": "AWS::AutoScaling::AutoScalingGroup",
+            "Properties": { 
+                "AvailabilityZones": [ "us-east-1b" ],
+                "LaunchConfigurationName": { "Ref": "LaunchConfig" },
+                "MinSize": "1",
+                "MaxSize": "5",
+                "DesiredCapacity": { "Ref": "WebServerCapacity" },
+                "LoadBalancerNames": [ { "Ref": "ElasticLoadBalancer" } ],
+                "VPCZoneIdentifier": [ "subnet-d99631ae" ]
+            }
+        },
+        "LaunchConfig": {
+            "Type": "AWS::AutoScaling::LaunchConfiguration",
+            "Properties": {
+                "ImageId": { "Ref": "amiID" },
+                "InstanceType": "t2.micro",
+                "KeyName": "kmosbey",
+                "SecurityGroups": [ "sg-8ba1a5ee", "sg-a0caaac4" ]
+            }
+        }
+    },
+    "Outputs" : {
+        "URL" : {
+            "Description" : "The URL of your website",
+            "Value" :  { "Fn::Join" : [ "", [ "http://", { "Fn::GetAtt" : [ "ElasticLoadBalancer", "DNSName" ]}]]}
+        }
+    }
+}
