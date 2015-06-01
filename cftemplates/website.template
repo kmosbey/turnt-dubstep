@@ -44,7 +44,7 @@
                 "MaxSize": "5",
                 "DesiredCapacity": { "Ref": "WebServerCapacity" },
                 "LoadBalancerNames": [ { "Ref": "ElasticLoadBalancer" } ],
-                "VPCZoneIdentifier": [ "subnet-d99631ae" ]
+                "VPCZoneIdentifier": [ "subnet-1221b377" ]
             }
         },
         "LaunchConfig": {
@@ -53,7 +53,7 @@
                 "ImageId": { "Ref": "amiID" },
                 "InstanceType": "t2.micro",
                 "KeyName": "kmosbey",
-                "SecurityGroups": [ "sg-8ba1a5ee", "sg-a0caaac4" ]
+                "SecurityGroups": [ "sg-81a0ace4", "sg-0fbfb36a" ]
             }
         }
     },
