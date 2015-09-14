@@ -6,6 +6,10 @@ package "php" do
   action :install
 end
 
+package "jq" do
+  action :install
+end
+
 service "httpd" do
   action :enable
 end
